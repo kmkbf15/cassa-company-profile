@@ -6,6 +6,7 @@
   --accent: #9B7E5A;
   --accent-light: #F5F0E8;
   --muted: #6B5E52;
+  --hero-bg: #1E1510;
 }
 
 @theme inline {
@@ -14,6 +15,7 @@
   --color-accent: var(--accent);
   --color-accent-light: var(--accent-light);
   --color-muted: var(--muted);
+  --color-hero-bg: var(--hero-bg);
   --font-display: var(--font-playfair);
   --font-sans: var(--font-inter);
 }
