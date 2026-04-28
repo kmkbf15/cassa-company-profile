@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import Button from "./ui/Button";
 
 const headingParts = [
@@ -9,17 +10,14 @@ const headingParts = [
   { text: ", not just seen.", italic: false },
 ];
 
-// Split into words, preserving which part each word/char came from
 type Word = { chars: string[]; italic: boolean };
 
 const words: Word[] = [];
 for (const { text, italic } of headingParts) {
-  // Split on spaces but keep the space as a separate token
   const tokens = text.split(/(\s+)/);
   for (const token of tokens) {
     if (!token) continue;
     if (/^\s+$/.test(token)) {
-      // space between words — attach as trailing space to last word
       if (words.length > 0) words[words.length - 1].chars.push(" ");
     } else {
       words.push({ chars: token.split(""), italic });
@@ -37,11 +35,19 @@ const charVariants = {
 };
 
 export default function Hero() {
-  return (
-    <section className="relative min-h-screen bg-hero-bg grid lg:grid-cols-[55%_45%]">
-      {/* Left — content */}
-      <div className="flex flex-col justify-center px-10 md:px-16 pt-16 pb-12">
+  const heroRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+  // Image card exits faster than content → depth illusion on scroll-away
+  const imageY = useTransform(scrollYProgress, [0, 1], [0, -160]);
+  const contentY = useTransform(scrollYProgress, [0, 1], [0, -70]);
 
+  return (
+    <section ref={heroRef} className="relative min-h-screen bg-hero-bg grid lg:grid-cols-[55%_45%]">
+      {/* Left — content */}
+      <motion.div style={{ y: contentY }} className="flex flex-col justify-center px-10 md:px-16 pt-16 pb-12">
         {/* Label */}
         <motion.div
           className="flex items-center gap-2 mb-8"
@@ -55,7 +61,7 @@ export default function Hero() {
           </p>
         </motion.div>
 
-        {/* Heading — letter by letter, words stay intact */}
+        {/* Heading — letter by letter */}
         <motion.h1
           className="font-display text-4xl md:text-5xl xl:text-[3.5rem] font-bold text-white leading-[1.1] mb-6"
           initial="hidden"
@@ -84,8 +90,7 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.7, duration: 0.55, ease: "easeOut" }}
         >
-          Thoughtfully crafted interiors where everyday moments turn into
-          lasting memories.
+          Thoughtfully crafted interiors where everyday moments turn into lasting memories.
         </motion.p>
 
         {/* Button */}
@@ -94,21 +99,15 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.85, duration: 0.55, ease: "easeOut" }}
         >
-          <Button
-            href="https://wa.me/628121286666"
-            target="_blank"
-            rel="noopener noreferrer"
-            variant="light"
-          >
+          <Button href="https://wa.me/628121286666" target="_blank" rel="noopener noreferrer" variant="light">
             Free Consult Now
           </Button>
         </motion.div>
-      </div>
+      </motion.div>
 
-      {/* Right — image with rounded card */}
-      <div className="hidden lg:block relative p-5 pl-3">
+      {/* Right — image card rises faster on scroll */}
+      <motion.div style={{ y: imageY }} className="hidden lg:block relative p-5 pl-3">
         <div className="relative h-full rounded-2xl overflow-hidden bg-accent-light">
-          {/* Placeholder — replace with <Image> once assets are ready */}
           <div className="absolute inset-0 flex items-center justify-center text-muted/30 text-sm font-sans">
             Hero photo
           </div>
@@ -124,14 +123,12 @@ export default function Hero() {
                 ))}
               </div>
               <p className="text-xs text-foreground font-sans leading-snug">
-                Based in Gading Serpong,
-                <br />
-                Tangerang.
+                Based in Gading Serpong,<br />Tangerang.
               </p>
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }

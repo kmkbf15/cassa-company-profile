@@ -1,6 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
+const EASE = [0.22, 1, 0.36, 1] as const;
+
+const fadeUp = (delay = 0) => ({
+  initial: { opacity: 0, y: 32 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: "-80px" },
+  transition: { duration: 0.8, delay, ease: EASE },
+});
 
 const faqs = [
   {
@@ -39,29 +49,46 @@ export default function FAQ() {
   return (
     <section id="faqs" className="py-24 bg-accent-light">
       <div className="max-w-3xl mx-auto px-6">
-        <div className="mb-14">
+        <motion.div className="mb-14" {...fadeUp(0)}>
           <p className="text-sm uppercase tracking-widest text-accent mb-4 font-sans">FAQs</p>
           <h2 className="font-display text-4xl md:text-5xl font-semibold text-foreground leading-snug">
             Common questions.
           </h2>
-        </div>
+        </motion.div>
 
         <div className="flex flex-col divide-y divide-accent/20">
           {faqs.map((faq, i) => (
-            <div key={i} className="py-5">
+            <motion.div key={i} {...fadeUp(i * 0.05)}>
               <button
-                className="w-full flex items-center justify-between gap-4 text-left"
+                className="w-full flex items-center justify-between gap-4 text-left py-5"
                 onClick={() => setOpen(open === i ? null : i)}
               >
                 <span className="font-sans font-medium text-foreground">{faq.q}</span>
-                <span className="shrink-0 text-accent text-xl leading-none">
-                  {open === i ? "−" : "+"}
-                </span>
+                <motion.span
+                  animate={{ rotate: open === i ? 45 : 0 }}
+                  transition={{ duration: 0.3, ease: EASE }}
+                  className="shrink-0 text-accent text-xl leading-none"
+                >
+                  +
+                </motion.span>
               </button>
-              {open === i && (
-                <p className="mt-3 text-sm text-muted font-sans leading-relaxed">{faq.a}</p>
-              )}
-            </div>
+
+              <AnimatePresence initial={false}>
+                {open === i && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.5, ease: EASE }}
+                    style={{ overflow: "hidden" }}
+                  >
+                    <p className="pb-5 text-sm text-muted font-sans leading-relaxed border-l-2 border-accent pl-4">
+                      {faq.a}
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
           ))}
         </div>
       </div>
