@@ -7,7 +7,12 @@ interface ButtonProps extends Omit<HTMLMotionProps<"a">, "variants"> {
   variant?: "light" | "dark";
 }
 
-export default function Button({ children, variant = "light", className = "", ...props }: ButtonProps) {
+export default function Button({
+  children,
+  variant = "light",
+  className = "",
+  ...props
+}: ButtonProps) {
   const [hovered, setHovered] = useState(false);
   const isLight = variant === "light";
 
@@ -58,7 +63,7 @@ export default function Button({ children, variant = "light", className = "", ..
       </motion.span>
 
       {/* Circle + Arrow wrapper — takes layout space */}
-      <span className="relative w-10 h-10 flex-shrink-0">
+      <span className="relative w-10 h-10 shrink-0">
         {/* Expanding circle */}
         <motion.span
           className={`absolute inset-0 rounded-full ${isLight ? "bg-white" : "bg-foreground"}`}
